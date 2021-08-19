@@ -11,14 +11,9 @@ import {
   Button,
   Alert,
 } from "react-native";
-import AppLoading from "expo-app-loading";
-import { useFonts, Quicksand_500Medium } from "@expo-google-fonts/quicksand";
+import { useFonts, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
 
 export default class HomeSection extends Component {
-    
-  constructor() {
-  }
-
   _onPressBlock() {
     Alert.alert("You tapped the button!");
   }
@@ -28,26 +23,18 @@ export default class HomeSection extends Component {
   }
 
   render() {
-    let [fontsLoaded] = useFonts({
-      Quicksand_500Medium,
-    });
-
-    if (!fontsLoaded) {
-      return <AppLoading />;
-    } else {
-      return (
-        <TouchableNativeFeedback
-          onPress={this._onPressBlock}
-          onLongPress={this._onLongPressButton}
-        >
-          <View style={styles.HomeSection}>
-            <Text style={styles.Heading}>this.header</Text>
-            <View style={styles.Rule} />
-            <Button title={"Button"} style={styles.Button} />
-          </View>
-        </TouchableNativeFeedback>
-      );
-    }
+    return (
+      <TouchableNativeFeedback
+        onPress={this._onPressBlock}
+        onLongPress={this._onLongPressButton}
+      >
+        <View style={styles.HomeSection}>
+          <Text style={styles.Heading}>Header</Text>
+          <View style={styles.Rule} />
+          <Button title={"Button"} style={styles.Button} />
+        </View>
+      </TouchableNativeFeedback>
+    );
   }
 }
 
@@ -58,7 +45,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   Heading: {
-    fontFamily: "Quicksand_500Medium",
+    fontFamily: "Quicksand_700Bold",
     fontSize: 25,
     textAlign: "right",
     color: "#fff",

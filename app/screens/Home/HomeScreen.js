@@ -8,6 +8,7 @@ import {
   Text,
 } from "react-native";
 import HomeSection from "./HomeSection";
+import { useFonts, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
 
 function HomeScreen(props) {
   return (
@@ -28,6 +29,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight + 10 : 0,
   },
   Header: {
+    fontFamily: "Quicksand_700Bold",
     color: "#fff",
     fontSize: 50,
   },
