@@ -13,29 +13,14 @@ import {
 } from "react-native";
 import { useFonts, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
 
-export default class HomeSection extends Component {
-  _onPressBlock() {
-    Alert.alert("You tapped the button!");
-  }
-
-  _onLongPressButton() {
-    Alert.alert("You long-pressed the button!");
-  }
-
-  render() {
-    return (
-      <TouchableNativeFeedback
-        onPress={this._onPressBlock}
-        onLongPress={this._onLongPressButton}
-      >
-        <View style={styles.HomeSection}>
-          <Text style={styles.Heading}>Header</Text>
-          <View style={styles.Rule} />
-          <Button title={"Button"} style={styles.Button} />
-        </View>
-      </TouchableNativeFeedback>
-    );
-  }
+export default function HomeSection({ link, title }) {
+  return (
+    <View style={styles.HomeSection}>
+      <Text style={styles.Heading}>{title}</Text>
+      <View style={styles.Rule} />
+      <Button title={"Button"} style={styles.Button} onPress={link} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -52,8 +37,8 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   Rule: {
-    borderBottomColor: "grey",
-    borderBottomWidth: 1,
+    borderBottomColor: "white",
+    borderBottomWidth: 2,
     marginBottom: 5,
   },
   Button: {
