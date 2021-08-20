@@ -1,133 +1,257 @@
-import React from "react";
-import { Platform } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  StatusBar,
+  Animated,
+  Platform,
+  TouchableNativeFeedback,
+} from "react-native";
+import { SafeAreaView, withOrientation } from "react-navigation";
+import profile from "./app/assets/profile.jpg";
+import Ionicon from "react-native-vector-icons/Ionicons";
+import { useState } from "react";
+import background from "./app/assets/background.jpg";
 
-import { useFonts, Quicksand_700Bold } from "@expo-google-fonts/quicksand";
+const themeColour = "#006e8c";
+const secondaryColour = "#444"; //5359D1
+const secondaryContrast = "#ddd";
 
-import { AuthContext } from "./app/context";
+export default function App() {
+  const [currentTab, setCurrentTab] = useState("Home");
+  const [showMenu, setShowMenu] = useState(false);
 
-import { SignIn, CreateAccount } from "./app/screens/Account";
-import { HomeScreen, Splash } from "./app/screens/Home";
-import { CreateRecord, RecordPage } from "./app/screens/Records";
-import Graphs from "./app/screens/Graphs";
+  const offsetValue = useRef(new Animated.Value(0)).current;
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const closeButtonOffset = useRef(new Animated.Value(0)).current;
 
-import { headerOptions, tabOptionStyle } from "./app/styles/headerOptions";
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={{ justifyContent: "flex-start", padding: 20, flex: 1 }}>
+        <Image
+          source={profile}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 10,
+            marginTop: 8,
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            color: "white",
+            marginTop: 20,
+          }}
+        >
+          Luke Catherall
+        </Text>
 
-const AuthStack = createNativeStackNavigator();
+        <TouchableOpacity>
+          <Text
+            style={{
+              marginTop: 6,
+              color: "white",
+            }}
+          >
+            View Profile
+          </Text>
+        </TouchableOpacity>
 
-const Drawer = createDrawerNavigator();
+        <View style={{ flexGrow: 1, marginTop: 80 }}>
+          {
+            // Tab bar buttons
+          }
+          {TabButton(currentTab, setCurrentTab, "Home", "home-outline")}
+          {TabButton(currentTab, setCurrentTab, "Records", "receipt-outline")}
+          {TabButton(currentTab, setCurrentTab, "Graphs", "analytics-outline")}
+        </View>
 
-const HomeStack = createNativeStackNavigator();
-const RecordStack = createNativeStackNavigator();
-const GraphStack = createNativeStackNavigator();
+        {TabButton(currentTab, setCurrentTab, "Log Out", "log-out-outline")}
+      </View>
 
-const HomeStackScreen = () => (
-  <HomeStack.Navigator>
-    <HomeStack.Screen
-      name="Home"
-      component={HomeScreen}
-      options={headerOptions}
-    />
-  </HomeStack.Navigator>
-);
+      {
+        // Overlay View
+      }
 
-const RecordStackScreen = () => (
-  <RecordStack.Navigator>
-    <RecordStack.Screen
-      name="Records"
-      component={RecordPage}
-      options={headerOptions}
-    />
-    <RecordStack.Screen
-      name="Create Record"
-      component={CreateRecord}
-      options={headerOptions}
-    />
-  </RecordStack.Navigator>
-);
+      <Animated.View
+        style={{
+          flexGrow: 1,
+          backgroundColor: secondaryColour,
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          paddingHorizontal: 15,
+          paddingVertical: 15,
+          borderRadius: showMenu ? 15 : 0,
 
-const GraphStackScreen = () => (
-  <GraphStack.Navigator>
-    <GraphStack.Screen
-      name="Graph"
-      component={Graphs}
-      options={headerOptions}
-    />
-  </GraphStack.Navigator>
-);
+          transform: [
+            {
+              scale: scaleValue,
+            },
+            {
+              translateX: offsetValue,
+            },
+          ],
+        }}
+      >
+        {
+          // Menu Button
+        }
 
-const DrawerNavigator = () => (
-  <Drawer.Navigator screenOptions={{ headerShown: false }}>
-    <Drawer.Screen name="Home" component={HomeScreen} />
-    <Drawer.Screen name="Records" component={RecordStackScreen} />
-    <Drawer.Screen name="Graphs" component={Graphs} />
-  </Drawer.Navigator>
-);
+        <Animated.View
+          style={{
+            transform: [
+              {
+                translateY: closeButtonOffset,
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              Animated.timing(scaleValue, {
+                toValue: showMenu ? 1 : 0.88,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
+              Animated.timing(offsetValue, {
+                toValue: showMenu ? 0 : 220,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
+              Animated.timing(closeButtonOffset, {
+                toValue: !showMenu ? -30 : 0,
+                duration: 300,
+                useNativeDriver: true,
+              }).start();
 
-const TabNavigator = () => (
-  <Tab.Navigator screenOptions={tabOptionStyle}>
-    <Tab.Screen name="HomeTab" component={HomeScreen} options={headerOptions} />
-    <Tab.Screen
-      name="RecordsTab"
-      component={RecordStackScreen}
-      options={headerOptions}
-    />
-    <Tab.Screen name="GraphsTab" component={Graphs} options={headerOptions} />
-  </Tab.Navigator>
-);
+              setShowMenu(!showMenu);
+            }}
+          >
+            <Ionicon
+              name={showMenu ? "close" : "menu"}
+              size={30}
+              color={secondaryContrast}
+              style={{
+                marginTop: StatusBar.currentHeight,
+              }}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 30,
+              fontWeight: "bold",
+              color: secondaryContrast,
+              paddingTop: 20,
+            }}
+          >
+            {currentTab}
+          </Text>
 
-const Tab = createBottomTabNavigator();
+          {page(currentTab)}
+        </Animated.View>
+      </Animated.View>
+    </SafeAreaView>
+  );
+}
 
-export default () => {
-  console.log("App Started on " + Platform.OS);
+const page = (currentTab) => {
+  if (currentTab == "Home") {
+    return (
+      <View>
+        <Image
+          source={background}
+          style={{
+            width: "100%",
+            borderRadius: 15,
+            height: 500,
+            marginTop: 20,
+          }}
+        />
 
-  const [loaded] = useFonts({
-    Quicksand_700Bold,
-  });
-
-  const [userToken, setUserToken] = React.useState("null");
-  const authContext = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setUserToken("blahbalh");
-      },
-      signUp: () => {
-        setUserToken("blahbalh");
-      },
-      signOut: () => {
-        setUserToken(null);
-      },
-    };
-  }, []);
-
-  if (!loaded) {
-    return <Splash />;
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            paddingTop: 15,
+            paddingBottom: 8,
+            color: secondaryContrast,
+          }}
+        >
+          Joshua Cook
+        </Text>
+        <Text
+          style={{
+            color: secondaryContrast,
+          }}
+        >
+          Fevo Driver, Pizza Delivery Boi, Cute af
+        </Text>
+      </View>
+    );
   } else {
     return (
-      <AuthContext.Provider value={authContext}>
-        <NavigationContainer>
-          {userToken ? (
-            <DrawerNavigator />
-          ) : (
-            <AuthStack.Navigator>
-              <AuthStack.Screen
-                name="SignIn"
-                component={SignIn}
-                options={{ title: "Sign In" }}
-              />
-              <AuthStack.Screen
-                name="CreateAccount"
-                component={CreateAccount}
-                options={{ title: "Create Account" }}
-              />
-            </AuthStack.Navigator>
-          )}
-        </NavigationContainer>
-      </AuthContext.Provider>
+      <View>
+        <Text> IDK </Text>
+      </View>
     );
   }
 };
+
+const TabButton = (currentTab, setCurrentTab, title, image) => (
+  <TouchableOpacity
+    onPress={() => {
+      if (title == "Log Out") {
+        // TODO
+      } else {
+        setCurrentTab(title);
+      }
+    }}
+  >
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 8,
+        paddingLeft: 15,
+        paddingRight: 40,
+        backgroundColor: currentTab == title ? "white" : "transparent",
+        borderRadius: 8,
+        marginTop: 10,
+      }}
+    >
+      <Ionicon
+        name={image}
+        size={25}
+        color={currentTab == title ? themeColour : "white"}
+      />
+      <Text
+        style={{
+          fontSize: 15,
+          fontWeight: "bold",
+          paddingLeft: 15,
+          color: currentTab == title ? themeColour : "white",
+        }}
+      >
+        {title}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: themeColour,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    paddingTop: StatusBar.currentHeight,
+  },
+});
