@@ -9,12 +9,14 @@ import {
   Animated,
   Platform,
   TouchableNativeFeedback,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView, withOrientation } from "react-navigation";
 import profile from "./app/assets/profile.jpg";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import { useState } from "react";
 import background from "./app/assets/background.jpg";
+import { Easing } from "react-native-reanimated";
 
 const themeColour = "#006e8c";
 const secondaryColour = "#444"; //5359D1
@@ -30,134 +32,122 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ justifyContent: "flex-start", padding: 20, flex: 1 }}>
-        <Image
-          source={profile}
-          style={{
-            width: 60,
-            height: 60,
-            borderRadius: 10,
-            marginTop: 8,
-          }}
-        />
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            color: "white",
-            marginTop: 20,
-          }}
-        >
-          Luke Catherall
-        </Text>
-
-        <TouchableOpacity>
-          <Text
-            style={{
-              marginTop: 6,
-              color: "white",
-            }}
-          >
-            View Profile
-          </Text>
-        </TouchableOpacity>
-
-        <View style={{ flexGrow: 1, marginTop: 80 }}>
-          {
-            // Tab bar buttons
-          }
-          {TabButton(currentTab, setCurrentTab, "Home", "home-outline")}
-          {TabButton(currentTab, setCurrentTab, "Records", "receipt-outline")}
-          {TabButton(currentTab, setCurrentTab, "Graphs", "analytics-outline")}
-        </View>
-
-        {TabButton(currentTab, setCurrentTab, "Log Out", "log-out-outline")}
-      </View>
+      {navigation(currentTab, setCurrentTab)}
 
       {
         // Overlay View
       }
 
-      <Animated.View
-        style={{
-          flexGrow: 1,
-          backgroundColor: secondaryColour,
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          paddingHorizontal: 15,
-          paddingVertical: 15,
-          borderRadius: showMenu ? 15 : 0,
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (showMenu) {
+            Animated.timing(scaleValue, {
+              toValue: showMenu ? 1 : 0.88,
+              duration: 300,
+              useNativeDriver: true,
+              easing: Easing.inOut(Easing.exp),
+            }).start();
+            Animated.timing(offsetValue, {
+              toValue: showMenu ? 0 : 220,
+              duration: 500,
+              useNativeDriver: true,
+              easing: Easing.inOut(Easing.exp),
+            }).start();
+            Animated.timing(closeButtonOffset, {
+              toValue: !showMenu ? -30 : 0,
+              duration: 300,
+              useNativeDriver: true,
+              easing: Easing.inOut(Easing.exp),
+            }).start();
 
-          transform: [
-            {
-              scale: scaleValue,
-            },
-            {
-              translateX: offsetValue,
-            },
-          ],
+            setShowMenu(!showMenu);
+          }
         }}
       >
-        {
-          // Menu Button
-        }
-
         <Animated.View
           style={{
+            flexGrow: 1,
+            backgroundColor: secondaryColour,
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingHorizontal: 15,
+            paddingVertical: 15,
+            borderRadius: showMenu ? 15 : 0,
+
             transform: [
               {
-                translateY: closeButtonOffset,
+                scale: scaleValue,
+              },
+              {
+                translateX: offsetValue,
               },
             ],
           }}
         >
-          <TouchableOpacity
-            onPress={() => {
-              Animated.timing(scaleValue, {
-                toValue: showMenu ? 1 : 0.88,
-                duration: 300,
-                useNativeDriver: true,
-              }).start();
-              Animated.timing(offsetValue, {
-                toValue: showMenu ? 0 : 220,
-                duration: 300,
-                useNativeDriver: true,
-              }).start();
-              Animated.timing(closeButtonOffset, {
-                toValue: !showMenu ? -30 : 0,
-                duration: 300,
-                useNativeDriver: true,
-              }).start();
+          {
+            // Menu Button
+          }
 
-              setShowMenu(!showMenu);
-            }}
-          >
-            <Ionicon
-              name={showMenu ? "close" : "menu"}
-              size={30}
-              color={secondaryContrast}
-              style={{
-                marginTop: StatusBar.currentHeight,
-              }}
-            />
-          </TouchableOpacity>
-          <Text
+          <Animated.View
             style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              color: secondaryContrast,
-              paddingTop: 20,
+              transform: [
+                {
+                  translateY: closeButtonOffset,
+                },
+              ],
             }}
           >
-            {currentTab}
-          </Text>
+            <TouchableOpacity
+              onPress={() => {
+                Animated.timing(scaleValue, {
+                  toValue: showMenu ? 1 : 0.88,
+                  duration: 300,
+                  useNativeDriver: true,
+                  easing: Easing.inOut(Easing.exp),
+                }).start();
+                Animated.timing(offsetValue, {
+                  toValue: showMenu ? 0 : 220,
+                  duration: 500,
+                  useNativeDriver: true,
+                  easing: Easing.inOut(Easing.exp),
+                }).start();
+                Animated.timing(closeButtonOffset, {
+                  toValue: !showMenu ? -30 : 0,
+                  duration: 300,
+                  useNativeDriver: true,
+                  easing: Easing.inOut(Easing.exp),
+                }).start();
 
-          {page(currentTab)}
+                setShowMenu(!showMenu);
+              }}
+            >
+              <Ionicon
+                name={showMenu ? "close" : "menu"}
+                size={30}
+                color={secondaryContrast}
+                style={{
+                  marginTop: StatusBar.currentHeight,
+                }}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontSize: 30,
+                fontWeight: "bold",
+                color: secondaryContrast,
+                paddingTop: 20,
+              }}
+            >
+              {currentTab}
+            </Text>
+
+            {page(currentTab)}
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -204,6 +194,52 @@ const page = (currentTab) => {
     );
   }
 };
+
+const navigation = (currentTab, setCurrentTab) => (
+  <View style={{ justifyContent: "flex-start", padding: 20, flex: 1 }}>
+    <Image
+      source={profile}
+      style={{
+        width: 60,
+        height: 60,
+        borderRadius: 10,
+        marginTop: 8,
+      }}
+    />
+    <Text
+      style={{
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "white",
+        marginTop: 20,
+      }}
+    >
+      Luke Catherall
+    </Text>
+
+    <TouchableOpacity>
+      <Text
+        style={{
+          marginTop: 6,
+          color: "white",
+        }}
+      >
+        View Profile
+      </Text>
+    </TouchableOpacity>
+
+    <View style={{ flexGrow: 1, marginTop: 80 }}>
+      {
+        // Tab bar buttons
+      }
+      {TabButton(currentTab, setCurrentTab, "Home", "home-outline")}
+      {TabButton(currentTab, setCurrentTab, "Records", "receipt-outline")}
+      {TabButton(currentTab, setCurrentTab, "Graphs", "analytics-outline")}
+    </View>
+
+    {TabButton(currentTab, setCurrentTab, "Log Out", "log-out-outline")}
+  </View>
+);
 
 const TabButton = (currentTab, setCurrentTab, title, image) => (
   <TouchableOpacity
