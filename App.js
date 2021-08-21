@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -14,24 +14,38 @@ import {
 import { SafeAreaView, withOrientation } from "react-navigation";
 import profile from "./app/assets/profile.jpg";
 import Ionicon from "react-native-vector-icons/Ionicons";
-import { useState } from "react";
 import background from "./app/assets/background.jpg";
-import { Easing } from "react-native-reanimated";
+import { color, Easing } from "react-native-reanimated";
+import {
+  themeColour,
+  secondaryColour,
+  secondaryContrast,
+} from "./app/styles/globalColours";
 
-const themeColour = "#006e8c";
-const secondaryColour = "#444"; //5359D1
-const secondaryContrast = "#ddd";
+import { Home } from "./app/screens/Home";
+import { Records, addRecord } from "./app/screens/Records";
+import { Graphs } from "./app/screens/Graphs";
+
+import { FAB } from "react-native-paper";
+
+import moment from "moment";
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
+  const [menuButton, setMenuButton] = useState("menu");
 
   const offsetValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(1)).current;
   const closeButtonOffset = useRef(new Animated.Value(0)).current;
 
+  const [recordView, setRecordView] = useState(false);
+
+  var date = moment().utcOffset("+12:00").format("YYYY-MM-DD hh:mm:ss a");
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      {addRecord(recordView, setRecordView)}
       {navigation(currentTab, setCurrentTab)}
 
       {
@@ -41,26 +55,14 @@ export default function App() {
       <TouchableWithoutFeedback
         onPress={() => {
           if (showMenu) {
-            Animated.timing(scaleValue, {
-              toValue: showMenu ? 1 : 0.88,
-              duration: 300,
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.exp),
-            }).start();
-            Animated.timing(offsetValue, {
-              toValue: showMenu ? 0 : 220,
-              duration: 500,
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.exp),
-            }).start();
-            Animated.timing(closeButtonOffset, {
-              toValue: !showMenu ? -30 : 0,
-              duration: 300,
-              useNativeDriver: true,
-              easing: Easing.inOut(Easing.exp),
-            }).start();
-
-            setShowMenu(!showMenu);
+            animate(
+              showMenu,
+              setShowMenu,
+              setMenuButton,
+              scaleValue,
+              offsetValue,
+              closeButtonOffset
+            );
           }
         }}
       >
@@ -75,7 +77,7 @@ export default function App() {
             right: 0,
             paddingHorizontal: 15,
             paddingVertical: 15,
-            borderRadius: showMenu ? 15 : 0,
+            borderRadius: 15,
 
             transform: [
               {
@@ -102,30 +104,18 @@ export default function App() {
           >
             <TouchableOpacity
               onPress={() => {
-                Animated.timing(scaleValue, {
-                  toValue: showMenu ? 1 : 0.88,
-                  duration: 300,
-                  useNativeDriver: true,
-                  easing: Easing.inOut(Easing.exp),
-                }).start();
-                Animated.timing(offsetValue, {
-                  toValue: showMenu ? 0 : 220,
-                  duration: 500,
-                  useNativeDriver: true,
-                  easing: Easing.inOut(Easing.exp),
-                }).start();
-                Animated.timing(closeButtonOffset, {
-                  toValue: !showMenu ? -30 : 0,
-                  duration: 300,
-                  useNativeDriver: true,
-                  easing: Easing.inOut(Easing.exp),
-                }).start();
-
-                setShowMenu(!showMenu);
+                animate(
+                  showMenu,
+                  setShowMenu,
+                  setMenuButton,
+                  scaleValue,
+                  offsetValue,
+                  closeButtonOffset
+                );
               }}
             >
               <Ionicon
-                name={showMenu ? "close" : "menu"}
+                name={menuButton}
                 size={30}
                 color={secondaryContrast}
                 style={{
@@ -144,48 +134,71 @@ export default function App() {
               {currentTab}
             </Text>
 
-            {page(currentTab)}
+            {page(currentTab, date, recordView, setRecordView)}
           </Animated.View>
+
+          <FAB
+            onPress={() => setRecordView(true)}
+            icon="plus"
+            label="Add Record"
+            style={{
+              position: "absolute",
+              margin: 16,
+              right: 0,
+              bottom: 0,
+              backgroundColor: secondaryContrast,
+            }}
+          />
         </Animated.View>
       </TouchableWithoutFeedback>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const page = (currentTab) => {
-  if (currentTab == "Home") {
-    return (
-      <View>
-        <Image
-          source={background}
-          style={{
-            width: "100%",
-            borderRadius: 15,
-            height: 500,
-            marginTop: 20,
-          }}
-        />
+const animate = (
+  showMenu,
+  setShowMenu,
+  setMenuButton,
+  scaleValue,
+  offsetValue,
+  closeButtonOffset
+) => {
+  Animated.timing(scaleValue, {
+    toValue: showMenu ? 1 : 0.88,
+    duration: 300,
+    useNativeDriver: true,
+    easing: Easing.inOut(Easing.exp),
+  }).start();
+  Animated.timing(offsetValue, {
+    toValue: showMenu ? 0 : 220,
+    duration: 500,
+    useNativeDriver: true,
+    easing: Easing.inOut(Easing.exp),
+  }).start();
+  Animated.timing(closeButtonOffset, {
+    toValue: !showMenu ? -30 : 0,
+    duration: 300,
+    useNativeDriver: true,
+    easing: Easing.inOut(Easing.exp),
+  }).start();
 
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: "bold",
-            paddingTop: 15,
-            paddingBottom: 8,
-            color: secondaryContrast,
-          }}
-        >
-          Joshua Cook
-        </Text>
-        <Text
-          style={{
-            color: secondaryContrast,
-          }}
-        >
-          Fevo Driver, Pizza Delivery Boi, Cute af
-        </Text>
-      </View>
-    );
+  setShowMenu(!showMenu);
+  if (!showMenu) {
+    setMenuButton("close");
+  } else {
+    setMenuButton("menu");
+  }
+};
+
+const page = (currentTab, date, recordView, setRecordView) => {
+  if (currentTab == "Home") {
+    return Home(date);
+  } else if (currentTab == "Records") {
+    return recordView
+      ? addRecord(recordView, setRecordView)
+      : Records(recordView, setRecordView);
+  } else if (currentTab == "Graphs") {
+    return Graphs();
   } else {
     return (
       <View>
