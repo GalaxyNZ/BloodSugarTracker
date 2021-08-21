@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Animated,
-  Platform,
-  TouchableNativeFeedback,
   TouchableWithoutFeedback,
 } from "react-native";
 import { SafeAreaView, withOrientation } from "react-navigation";
@@ -143,7 +141,7 @@ export default function App() {
             label="Add Record"
             style={{
               position: "absolute",
-              margin: 16,
+              margin: 25,
               right: 0,
               bottom: 0,
               backgroundColor: secondaryContrast,
