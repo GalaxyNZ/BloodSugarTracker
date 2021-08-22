@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "84320130367",
+    "project_id": "blood-sugar-tracker-b65e4",
+    "storage_bucket": "blood-sugar-tracker-b65e4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:84320130367:android:baf45313d2e774d72aaf8a",
+        "android_client_info": {
+          "package_name": "com.reactnativefirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "84320130367-ofs598hilvkhm8dthvfcda244684aq83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3orwd5VT3w1D22tMd4MDQkeRKkXGJXoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "84320130367-ofs598hilvkhm8dthvfcda244684aq83.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

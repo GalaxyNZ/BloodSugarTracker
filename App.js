@@ -23,12 +23,17 @@ import {
 import { Home } from "./app/screens/Home";
 import { Records, addRecord } from "./app/screens/Records";
 import { Graphs } from "./app/screens/Graphs";
+import { LoginScreen, RegistrationScreen } from "./app/screens/Accounts";
+
+import { LogBox } from "react-native";
 
 import { FAB } from "react-native-paper";
 
 import moment from "moment";
 
 export default function App() {
+  LogBox.ignoreLogs(["Setting a timer"]);
+
   const [currentTab, setCurrentTab] = useState("Home");
   const [showMenu, setShowMenu] = useState(false);
   const [menuButton, setMenuButton] = useState("menu");
@@ -41,116 +46,154 @@ export default function App() {
 
   var date = moment().utcOffset("+12:00").format("YYYY-MM-DD hh:mm:ss a");
 
-  return (
-    <View style={styles.container}>
-      {addRecord(recordView, setRecordView)}
-      {navigation(currentTab, setCurrentTab)}
+  //const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-      {
-        // Overlay View
-      }
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [login, setLogin] = useState(true);
 
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (showMenu) {
-            animate(
-              showMenu,
-              setShowMenu,
-              setMenuButton,
-              scaleValue,
-              offsetValue,
-              closeButtonOffset
-            );
-          }
-        }}
-      >
-        <Animated.View
-          style={{
-            flexGrow: 1,
-            backgroundColor: secondaryColour,
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            paddingHorizontal: 15,
-            paddingVertical: 15,
-            borderRadius: 15,
+  if (user == null) {
+    return (
+      <View style={{ flex: 1 }}>
+        {login
+          ? LoginScreen(
+              email,
+              setEmail,
+              password,
+              setPassword,
+              setLogin,
+              setUser,
+              user
+            )
+          : RegistrationScreen(
+              email,
+              setEmail,
+              password,
+              setPassword,
+              fullName,
+              setFullName,
+              confirmPassword,
+              setConfirmPassword,
+              setLogin,
+              setUser
+            )}
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        {addRecord(recordView, setRecordView)}
+        {navigation(currentTab, setCurrentTab)}
 
-            transform: [
-              {
-                scale: scaleValue,
-              },
-              {
-                translateX: offsetValue,
-              },
-            ],
+        {
+          // Overlay View
+        }
+
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (showMenu) {
+              animate(
+                showMenu,
+                setShowMenu,
+                setMenuButton,
+                scaleValue,
+                offsetValue,
+                closeButtonOffset
+              );
+            }
           }}
         >
-          {
-            // Menu Button
-          }
-
           <Animated.View
             style={{
+              flexGrow: 1,
+              backgroundColor: secondaryColour,
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              borderRadius: 15,
+
               transform: [
                 {
-                  translateY: closeButtonOffset,
+                  scale: scaleValue,
+                },
+                {
+                  translateX: offsetValue,
                 },
               ],
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                animate(
-                  showMenu,
-                  setShowMenu,
-                  setMenuButton,
-                  scaleValue,
-                  offsetValue,
-                  closeButtonOffset
-                );
-              }}
-            >
-              <Ionicon
-                name={menuButton}
-                size={30}
-                color={secondaryContrast}
-                style={{
-                  marginTop: StatusBar.currentHeight,
-                }}
-              />
-            </TouchableOpacity>
-            <Text
+            {
+              // Menu Button
+            }
+
+            <Animated.View
               style={{
-                fontSize: 30,
-                fontWeight: "bold",
-                color: secondaryContrast,
-                paddingTop: 20,
+                transform: [
+                  {
+                    translateY: closeButtonOffset,
+                  },
+                ],
               }}
             >
-              {currentTab}
-            </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  animate(
+                    showMenu,
+                    setShowMenu,
+                    setMenuButton,
+                    scaleValue,
+                    offsetValue,
+                    closeButtonOffset
+                  );
+                }}
+              >
+                <Ionicon
+                  name={menuButton}
+                  size={30}
+                  color={secondaryContrast}
+                  style={{
+                    marginTop: StatusBar.currentHeight,
+                  }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 30,
+                  fontWeight: "bold",
+                  color: secondaryContrast,
+                  paddingTop: 20,
+                }}
+              >
+                {currentTab}
+              </Text>
 
-            {page(currentTab, date, recordView, setRecordView)}
+              {page(currentTab, date, recordView, setRecordView)}
+            </Animated.View>
+
+            <FAB
+              onPress={() => setRecordView(true)}
+              icon="plus"
+              label="Add Record"
+              style={{
+                position: "absolute",
+                margin: 25,
+                right: 0,
+                bottom: 0,
+                backgroundColor: secondaryContrast,
+              }}
+            />
           </Animated.View>
-
-          <FAB
-            onPress={() => setRecordView(true)}
-            icon="plus"
-            label="Add Record"
-            style={{
-              position: "absolute",
-              margin: 25,
-              right: 0,
-              bottom: 0,
-              backgroundColor: secondaryContrast,
-            }}
-          />
-        </Animated.View>
-      </TouchableWithoutFeedback>
-    </View>
-  );
+        </TouchableWithoutFeedback>
+      </View>
+    );
+  }
 }
 
 const animate = (
@@ -225,7 +268,7 @@ const navigation = (currentTab, setCurrentTab) => (
         marginTop: 20,
       }}
     >
-      Luke Catherall
+      First Lastname
     </Text>
 
     <TouchableOpacity>
