@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
 });
 
 const onLoginPress = (email, password, setUser) => {
-  console.log(email, password);
   firebase
     .auth()
     .signInWithEmailAndPassword(email, password)
@@ -108,7 +107,6 @@ export const LoginScreen = (
   setUser,
   user
 ) => {
-  console.log(user);
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ flex: 1, backgroundColor: secondaryColour }}>
@@ -188,7 +186,6 @@ const onRegisterPress = (
         .set(data)
         .then(() => {
           setUser(data);
-          console.log("Login Successful");
         })
         .catch((error) => {
           alert(error);

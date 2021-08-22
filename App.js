@@ -86,7 +86,7 @@ export default function App() {
     return (
       <View style={styles.container}>
         {addRecord(recordView, setRecordView)}
-        {navigation(currentTab, setCurrentTab)}
+        {navigation(currentTab, setCurrentTab, setUser)}
 
         {
           // Overlay View
@@ -249,7 +249,7 @@ const page = (currentTab, date, recordView, setRecordView) => {
   }
 };
 
-const navigation = (currentTab, setCurrentTab) => (
+const navigation = (currentTab, setCurrentTab, setUser) => (
   <View style={{ justifyContent: "flex-start", padding: 20, flex: 1 }}>
     <Image
       source={profile}
@@ -291,15 +291,21 @@ const navigation = (currentTab, setCurrentTab) => (
       {TabButton(currentTab, setCurrentTab, "Graphs", "analytics-outline")}
     </View>
 
-    {TabButton(currentTab, setCurrentTab, "Log Out", "log-out-outline")}
+    {TabButton(
+      currentTab,
+      setCurrentTab,
+      "Log Out",
+      "log-out-outline",
+      setUser
+    )}
   </View>
 );
 
-const TabButton = (currentTab, setCurrentTab, title, image) => (
+const TabButton = (currentTab, setCurrentTab, title, image, setUser) => (
   <TouchableOpacity
     onPress={() => {
       if (title == "Log Out") {
-        // TODO
+        setUser(null);
       } else {
         setCurrentTab(title);
       }
