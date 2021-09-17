@@ -1,3 +1,5 @@
 # Blood Sugar Tracker
 
-## HomeScreen branch
+Due to marking requirements, this is now hosted on GitLab. This will be updated intermittently
+
+## Main branch
