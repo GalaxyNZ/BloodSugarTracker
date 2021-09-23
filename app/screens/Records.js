@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,6 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import background from "../assets/background.jpg";
 import {
   themeColour,
   secondaryColour,
@@ -18,33 +17,44 @@ import {
 } from "../styles/globalColours";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import { TextInput, FAB } from "react-native-paper";
-import { render } from "react-dom";
 import { firebase } from "../firebase/config";
 
-export const addRecord = ({ recordView, setRecordView, userID }) => {
-  const [entityText, setEntityText] = useState("");
-
+export const addRecord = (
+  recordView,
+  setRecordView,
+  userID,
+  entityNote,
+  setEntityNote,
+  entityReading,
+  setEntityReading
+) => {
   const entityRef = firebase.firestore().collection("entities");
   //const userID = props.extraData.id;
 
   const onAddButtonPress = () => {
-    if (entityText && entityText.length > 0) {
+    if (
+      entityNote &&
+      entityNote.length > 0 &&
+      entityReading &&
+      entityReading.length > 0
+    ) {
       const timestamp = firebase.firestore.FieldValue.serverTimestamp();
       const data = {
-        text: entityText,
+        note: entityNote,
+        reading: entityReading,
         authorID: userID,
         createdAt: timestamp,
       };
       entityRef
         .add(data)
         .then((_doc) => {
-          setEntityText("");
           Keyboard.dismiss();
         })
         .catch((error) => {
           alert(error);
         });
     }
+    setRecordView(false);
   };
 
   return (
@@ -90,16 +100,7 @@ export const addRecord = ({ recordView, setRecordView, userID }) => {
                 }}
                 style={{ marginTop: 10 }}
                 keyboardType="numeric"
-              />
-              <TextInput
-                label="Date"
-                underlineColor={secondaryContrast}
-                theme={{
-                  colors: {
-                    primary: "#44bbcc",
-                  },
-                }}
-                style={{ marginTop: 10 }}
+                onChangeText={(text) => setEntityReading(text)}
               />
               <TextInput
                 label="Notes"
@@ -112,11 +113,11 @@ export const addRecord = ({ recordView, setRecordView, userID }) => {
                 multiline
                 numberOfLines={5}
                 style={{ marginTop: 10 }}
+                onChangeText={(text) => setEntityNote(text)}
               />
               <FAB
                 onPress={() => {
                   onAddButtonPress();
-                  setRecordView(false);
                 }}
                 icon="plus"
                 label="Add Record"
@@ -174,30 +175,14 @@ const Item = ({ title }) => (
 
 const renderItem = ({ item }) => <Item title={item.title} />;
 
-export const Records = (recordView, setRecordView, userID) => {
-  const [entities, setEntities] = useState([]);
-
+export const Records = ({
+  recordView,
+  setRecordView,
+  userID,
+  entities,
+  setEntities,
+}) => {
   const entityRef = firebase.firestore().collection("entities");
-
-  useEffect(() => {
-    entityRef
-      .where("authorID", "==", userID)
-      .orderBy("createdAt", "desc")
-      .onSnapshot(
-        (querySnapshot) => {
-          const newEntities = [];
-          querySnapshot.forEach((doc) => {
-            const entity = doc.data();
-            entity.id = doc.id;
-            newEntities.push(entity);
-          });
-          setEntities(newEntities);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-  }, []);
 
   const renderEntity = ({ item, index }) => {
     return (
@@ -237,10 +222,30 @@ export const Records = (recordView, setRecordView, userID) => {
     );
   };
 
+  useEffect(() => {
+    entityRef
+      .where("authorID", "==", userID)
+      .orderBy("createdAt", "desc")
+      .onSnapshot(
+        (querySnapshot) => {
+          const newEntities = [];
+          querySnapshot.forEach((doc) => {
+            const entity = doc.data();
+            entity.id = doc.id;
+            newEntities.push(entity);
+          });
+          setEntities(newEntities);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+  }, []);
+
   return (
     <View style={{ height: "80%" }}>
       <FlatList
-        data={DATA}
+        data={entities}
         renderItem={renderEntity}
         keyExtractor={(item) => item.id}
       />

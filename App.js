@@ -9,10 +9,8 @@ import {
   Animated,
   TouchableWithoutFeedback,
 } from "react-native";
-import { SafeAreaView, withOrientation } from "react-navigation";
 import profile from "./app/assets/profile.jpg";
 import Ionicon from "react-native-vector-icons/Ionicons";
-import background from "./app/assets/background.jpg";
 import { color, Easing } from "react-native-reanimated";
 import {
   themeColour,
@@ -59,6 +57,10 @@ export default function App() {
 
   const [userID, setUserID] = useState(null);
 
+  const [entityNote, setEntityNote] = useState("");
+  const [entityReading, setEntityReading] = useState("");
+  const [entities, setEntities] = useState([]);
+
   useEffect(() => {
     const usersRef = firebase.firestore().collection("users");
     firebase.auth().onAuthStateChanged((user) => {
@@ -70,6 +72,7 @@ export default function App() {
             const userData = document.data();
             setLoading(false);
             setUser(userData);
+            setUserID(user.uid);
           })
           .catch((error) => {
             setLoading(false);
@@ -114,7 +117,15 @@ export default function App() {
   } else {
     return (
       <View style={styles.container}>
-        {addRecord(recordView, setRecordView, userID)}
+        {addRecord(
+          recordView,
+          setRecordView,
+          userID,
+          entityNote,
+          setEntityNote,
+          entityReading,
+          setEntityReading
+        )}
         {navigation(currentTab, setCurrentTab, setUser)}
 
         {
@@ -260,13 +271,33 @@ const animate = (
   }
 };
 
-const page = (currentTab, date, recordView, setRecordView) => {
+const page = (
+  currentTab,
+  date,
+  recordView,
+  setRecordView,
+  userID,
+  entityNote,
+  setEntityNote,
+  entityReading,
+  setEntityReading,
+  entities,
+  setEntities
+) => {
   if (currentTab == "Home") {
     return Home(date);
   } else if (currentTab == "Records") {
     return recordView
-      ? addRecord(recordView, setRecordView)
-      : Records(recordView, setRecordView, userID);
+      ? addRecord(
+          recordView,
+          setRecordView,
+          userID,
+          entityNote,
+          setEntityNote,
+          entityReading,
+          setEntityReading
+        )
+      : Records(recordView, setRecordView, userID, entities, setEntities);
   } else if (currentTab == "Graphs") {
     return Graphs();
   } else {
