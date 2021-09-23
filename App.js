@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -31,6 +31,8 @@ import { FAB } from "react-native-paper";
 
 import moment from "moment";
 
+import { firebase } from "./app/firebase/config";
+
 export default function App() {
   LogBox.ignoreLogs(["Setting a timer"]);
 
@@ -46,7 +48,7 @@ export default function App() {
 
   var date = moment().utcOffset("+12:00").format("YYYY-MM-DD hh:mm:ss a");
 
-  //const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
   const [fullName, setFullName] = useState("");
@@ -54,6 +56,33 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [login, setLogin] = useState(true);
+
+  const [userID, setUserID] = useState(null);
+
+  useEffect(() => {
+    const usersRef = firebase.firestore().collection("users");
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        usersRef
+          .doc(user.uid)
+          .get()
+          .then((document) => {
+            const userData = document.data();
+            setLoading(false);
+            setUser(userData);
+          })
+          .catch((error) => {
+            setLoading(false);
+          });
+      } else {
+        setLoading(false);
+      }
+    });
+  }, []);
+
+  if (loading) {
+    return <View></View>;
+  }
 
   if (user == null) {
     return (
@@ -85,7 +114,7 @@ export default function App() {
   } else {
     return (
       <View style={styles.container}>
-        {addRecord(recordView, setRecordView)}
+        {addRecord(recordView, setRecordView, userID)}
         {navigation(currentTab, setCurrentTab, setUser)}
 
         {
@@ -237,7 +266,7 @@ const page = (currentTab, date, recordView, setRecordView) => {
   } else if (currentTab == "Records") {
     return recordView
       ? addRecord(recordView, setRecordView)
-      : Records(recordView, setRecordView);
+      : Records(recordView, setRecordView, userID);
   } else if (currentTab == "Graphs") {
     return Graphs();
   } else {

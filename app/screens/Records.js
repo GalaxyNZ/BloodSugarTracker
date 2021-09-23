@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,127 +19,34 @@ import {
 import Ionicon from "react-native-vector-icons/Ionicons";
 import { TextInput, FAB } from "react-native-paper";
 import { render } from "react-dom";
+import { firebase } from "../firebase/config";
 
-const DATA = [
-  {
-    id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "First Item",
-  },
-  {
-    id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "Second Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571se29d72",
-    title: "Fourth Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571sade29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571adasde29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571asdasde29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-14557fdsf1e29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-14557gdfgs1e29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571ehgfdh29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-1455adfgas71e29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29gasdfgd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e2ASD9d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29hgfdd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29hdfghd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571ebsgfd29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29sdfgvd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29tyjygd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29dfdghrty72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d7wretetrw2",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29wertcgfd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29dsfgretfsgs4red72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-1sads45571ebsgfd29d72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571asde29sdfgvd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571asdasde29tyjygd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29ASDASDdfdghrty72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571dase29dasdd7wretetrw2",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd9asd6-145571e29wertcgfd72",
-    title: "Third Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-basdasdd96-145571e29dsfgretfsgs4red72",
-    title: "Third Item",
-  },
-];
+export const addRecord = ({ recordView, setRecordView, userID }) => {
+  const [entityText, setEntityText] = useState("");
 
-export const addRecord = (recordView, setRecordView) => {
+  const entityRef = firebase.firestore().collection("entities");
+  //const userID = props.extraData.id;
+
+  const onAddButtonPress = () => {
+    if (entityText && entityText.length > 0) {
+      const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+      const data = {
+        text: entityText,
+        authorID: userID,
+        createdAt: timestamp,
+      };
+      entityRef
+        .add(data)
+        .then((_doc) => {
+          setEntityText("");
+          Keyboard.dismiss();
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
+  };
+
   return (
     <Modal visible={recordView} modal="fade" statusBarTranslucent={true}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -207,7 +114,10 @@ export const addRecord = (recordView, setRecordView) => {
                 style={{ marginTop: 10 }}
               />
               <FAB
-                onPress={() => setRecordView(false)}
+                onPress={() => {
+                  onAddButtonPress();
+                  setRecordView(false);
+                }}
                 icon="plus"
                 label="Add Record"
                 style={{
@@ -264,12 +174,74 @@ const Item = ({ title }) => (
 
 const renderItem = ({ item }) => <Item title={item.title} />;
 
-export const Records = (recordView, setRecordView) => {
+export const Records = (recordView, setRecordView, userID) => {
+  const [entities, setEntities] = useState([]);
+
+  const entityRef = firebase.firestore().collection("entities");
+
+  useEffect(() => {
+    entityRef
+      .where("authorID", "==", userID)
+      .orderBy("createdAt", "desc")
+      .onSnapshot(
+        (querySnapshot) => {
+          const newEntities = [];
+          querySnapshot.forEach((doc) => {
+            const entity = doc.data();
+            entity.id = doc.id;
+            newEntities.push(entity);
+          });
+          setEntities(newEntities);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+  }, []);
+
+  const renderEntity = ({ item, index }) => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          borderBottomColor: themeColour,
+          borderBottomWidth: 2,
+          marginTop: 10,
+          padding: 5,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+          }}
+        >
+          <Text style={{ fontSize: 25, flex: 1, color: secondaryContrast }}>
+            {index}
+          </Text>
+          <Text
+            style={{
+              fontSize: 25,
+              flex: 1,
+              color: secondaryContrast,
+              textAlign: "right",
+            }}
+          >
+            {item.text}
+          </Text>
+        </View>
+        {}
+        <Text style={{ fontSize: 15, flex: 1, color: secondaryContrast }}>
+          Other
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={{ height: "80%" }}>
       <FlatList
         data={DATA}
-        renderItem={renderItem}
+        renderItem={renderEntity}
         keyExtractor={(item) => item.id}
       />
     </View>
