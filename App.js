@@ -83,6 +83,31 @@ export default function App() {
     });
   }, []);
 
+  const entityRef = firebase.firestore().collection("entities");
+  useEffect(() => {
+    const unsub = entityRef
+      .where("authorID", "==", "CbXRhbjiz5V7SG4SvjXt0uNFCNu1")
+      .orderBy("createdAt", "desc")
+      .onSnapshot(
+        (querySnapshot) => {
+          const newEntities = [];
+          querySnapshot.forEach((doc) => {
+            const entity = doc.data();
+            entity.id = doc.id;
+            newEntities.push(entity);
+          });
+          setEntities(newEntities);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+    return () => {
+      unsub();
+    };
+  }, []);
+
   if (loading) {
     return <View></View>;
   }

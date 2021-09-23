@@ -182,7 +182,7 @@ export const Records = ({
   entities,
   setEntities,
 }) => {
-  const entityRef = firebase.firestore().collection("entities");
+  console.log(entities);
 
   const renderEntity = ({ item, index }) => {
     return (
@@ -222,33 +222,18 @@ export const Records = ({
     );
   };
 
-  useEffect(() => {
-    entityRef
-      .where("authorID", "==", userID)
-      .orderBy("createdAt", "desc")
-      .onSnapshot(
-        (querySnapshot) => {
-          const newEntities = [];
-          querySnapshot.forEach((doc) => {
-            const entity = doc.data();
-            entity.id = doc.id;
-            newEntities.push(entity);
-          });
-          setEntities(newEntities);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-  }, []);
-
   return (
     <View style={{ height: "80%" }}>
-      <FlatList
-        data={entities}
-        renderItem={renderEntity}
-        keyExtractor={(item) => item.id}
-      />
+      {entities && (
+        <View style={styles.listContainer}>
+          <FlatList
+            data={entities}
+            renderItem={renderEntity}
+            keyExtractor={(item) => item.id}
+            removeClippedSubviews={true}
+          />
+        </View>
+      )}
     </View>
   );
 };
